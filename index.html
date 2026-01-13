@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hike Countdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Special Elite font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(160deg, #0b1220, #0e2a2a);
+      color: #eaf2ff;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(10, 14, 25, 0.65);
+      border-radius: 20px;
+      padding: 26px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-family: "Special Elite", serif;
+      font-size: 28px;
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    p {
+      text-align: center;
+      color: rgba(234,242,255,0.8);
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-size: 13px;
+      color: rgba(234,242,255,0.8);
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      margin-top: 6px;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 15px;
+      font-weight: 600;
+      background: #9be7c4;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: rgba(234,242,255,0.14);
+      color: #eaf2ff;
+    }
+
+    .timer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .unit {
+      flex: 1;
+    }
+
+    .number {
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .unit-label {
+      font-size: 12px;
+      color: rgba(234,242,255,0.7);
+    }
+
+    .reminder {
+      margin-top: 18px;
+      font-size: 12px;
+      color: rgba(234,242,255,0.65);
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h1>Hike Countdown</h1>
+
+    <p>
+      Set your hike date and let the countdown keep your intention alive.
+    </p>
+
+    <label for="dateInput">Hike date & time</label>
+    <input type="datetime-local" id="dateInput" />
+
+    <button onclick="saveDate()">Set Countdown</button>
+    <button class="secondary" onclick="resetDate()">Reset</button>
+
+    <div class="timer">
+      <div class="unit">
+        <div class="number" id="days">00</div>
+        <div class="unit-label">Days</div>
+      </div>
+      <div class="unit">
+        <div class="number" id="hours">00</div>
+        <div class="unit-label">Hours</div>
+      </div>
+      <div class="unit">
+        <div class="number" id="minutes">00</div>
+        <div class="unit-label">Minutes</div>
+      </div>
+    </div>
+
+    <div class="reminder">
+      Tip: bookmark this countdown so it’s ready for your next adventure.
+    </div>
+  </div>
+
+  <script>
+    let targetDate = null;
+    const STORAGE_KEY = "hikeDate";
+
+    function saveDate() {
+      const input = document.getElementById("dateInput").value;
+      if (!input) return;
+
+      targetDate = new Date(input);
+      localStorage.setItem(STORAGE_KEY, targetDate.toISOString());
+      updateTimer();
+    }
+
+    function resetDate() {
+      localStorage.removeItem(STORAGE_KEY);
+      targetDate = null;
+
+      document.getElementById("dateInput").value = "";
+      document.getElementById("days").textContent = "00";
+      document.getElementById("hours").textContent = "00";
+      document.getElementById("minutes").textContent = "00";
+    }
+
+    function updateTimer() {
+      if (!targetDate) return;
+
+      const now = new Date();
+      let diff = targetDate - now;
+      if (diff < 0) diff = 0;
+
+      const minutes = Math.floor(diff / 60000);
+      const days = Math.floor(minutes / (60 * 24));
+      const hours = Math.floor((minutes % (60 * 24)) / 60);
+      const mins = minutes % 60;
+
+      document.getElementById("days").textContent = days;
+      document.getElementById("hours").textContent = hours;
+      document.getElementById("minutes").textContent = mins;
+    }
+
+    function loadSavedDate() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+
+      targetDate = new Date(saved);
+      updateTimer();
+    }
+
+    loadSavedDate();
+    setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html>
